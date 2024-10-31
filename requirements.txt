@@ -2,3 +2,4 @@ tqdm
 tensorflow
 keras
 pillow
+matplotlib
