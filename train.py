@@ -1,5 +1,3 @@
-from math import floor
-
 from numpy.random import randint
 from keras.src.callbacks import (Callback,
                                  ModelCheckpoint,
