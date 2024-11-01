@@ -45,12 +45,6 @@ def get_model():
 
     return UNet
 
-# def compile_model(model):
-#     compiled_model = model.compile(
-#         loss='binary_crossentropy',
-#         optimizer='adam')
-#     return compiled_model
-
 def visualize_model(model):
     plot_model(model, "UNet-WaterBody.png", show_shapes=True)
 

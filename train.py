@@ -1,5 +1,9 @@
+from math import floor
+
 from numpy.random import randint
-from keras.src.callbacks import Callback, ModelCheckpoint
+from keras.src.callbacks import (Callback,
+                                 ModelCheckpoint,
+                                 CSVLogger)
 import tensorflow as tf
 from data import load_data
 import matplotlib.pyplot as plt
@@ -10,9 +14,6 @@ from model import get_model
 
 def train_model(path):
     (X_train, y_train), (X_val, y_val) = load_data(path)
-
-    BATCH_SIZE = 16
-    SPE = len(X_train) // BATCH_SIZE
 
     class ShowProgress(Callback):
         def on_epoch_end(self, epoch, logs=None):
@@ -35,6 +36,7 @@ def train_model(path):
             plt.show()
 
     cbs = [
+        CSVLogger('unet_logs.csv', separator=',', append=False),
         ModelCheckpoint("UNet-WaterBodySegmentation.keras", save_best_only=True),
         ShowProgress()
     ]
@@ -46,12 +48,13 @@ def train_model(path):
         optimizer=tf.optimizers.Adam()
     )
 
+    print(f'Model information: {model.summary()}')
+
     model.fit(
         X_train,
         y_train,
         epochs=20,
-        batch_size=BATCH_SIZE,
-        steps_per_epoch=SPE,
+        batch_size=16,
         validation_data=(X_val, y_val),
         callbacks=cbs
     )
