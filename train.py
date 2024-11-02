@@ -39,17 +39,12 @@ def train_model(path):
 
     cbs = [
         CSVLogger('unet_logs.csv', separator=',', append=False),
-        ModelCheckpoint("UNet-WaterBodySegmentation.keras", save_best_only=True)
-        # ShowProgress()
+        ModelCheckpoint("UNet-WaterBodySegmentation.keras", save_best_only=True),
+        ShowProgress()
     ]
 
     model = get_model()
     print('model :', model)
-    model.compile(
-        loss='binary_crossentropy',
-        optimizer='adam',
-        metrics=['accuracy']
-    )
 
     print(f'Model information: {model.summary()}')
 

@@ -43,6 +43,12 @@ def get_model():
 
     print(f" UNet : {UNet} type of UNet is {type(UNet)}")
 
+    UNet.compile(
+        loss='binary_crossentropy',
+        optimizer='adam',
+        metrics=['accuracy']
+    )
+
     return UNet
 
 def visualize_model(model):
@@ -50,9 +56,4 @@ def visualize_model(model):
 
 if __name__ == "__main__":
     model = get_model(),
-    print("model : ",model)
-    model[0].compile(
-        loss='binary_crossentropy',
-        optimizer= tf.optimizers.Adam()
-    )
-    model[0].summary()
+    print("model : ",model.summary())
