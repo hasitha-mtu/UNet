@@ -1,11 +1,11 @@
-from keras.src.models import Model
-from keras.src.layers import (Input,
-                              Conv2D)
+import tensorflow as tf
+from keras.layers import (Input,
+                          Conv2D)
+from keras.models import Model
 from tensorflow.python.keras.utils.vis_utils import plot_model
+
 from decoder import Decoder
 from encoder import Encoder
-import keras
-import tensorflow as tf
 
 
 def get_model():

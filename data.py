@@ -1,9 +1,9 @@
 import os
 
-from tensorflow.image import resize
-from keras.preprocessing.image import load_img, img_to_array
-from glob import glob
 import numpy as np
+from keras.utils import load_img, img_to_array
+from tensorflow.image import resize
+from glob import glob
 from tqdm import tqdm
 
 def load_image(path: str):

@@ -1,17 +1,21 @@
-from numpy.random import randint
-from keras.src.callbacks import (Callback,
-                                 ModelCheckpoint,
-                                 CSVLogger)
-import tensorflow as tf
-from data import load_data
-import matplotlib.pyplot as plt
+from math import floor
 
+import matplotlib.pyplot as plt
+import tensorflow as tf
+from keras.callbacks import (Callback,
+                             ModelCheckpoint,
+                             CSVLogger)
+from numpy.random import randint
+
+from data import load_data
 from data_viz import show_image
 from model import get_model
 
 
 def train_model(path):
     (X_train, y_train), (X_val, y_val) = load_data(path)
+    print(f'X_train shape : {X_train.shape}')
+    print(f'y_train shape : {y_train.shape}')
 
     class ShowProgress(Callback):
         def on_epoch_end(self, epoch, logs=None):
@@ -35,15 +39,16 @@ def train_model(path):
 
     cbs = [
         CSVLogger('unet_logs.csv', separator=',', append=False),
-        ModelCheckpoint("UNet-WaterBodySegmentation.keras", save_best_only=True),
-        ShowProgress()
+        ModelCheckpoint("UNet-WaterBodySegmentation.keras", save_best_only=True)
+        # ShowProgress()
     ]
 
     model = get_model()
     print('model :', model)
     model.compile(
         loss='binary_crossentropy',
-        optimizer=tf.optimizers.Adam()
+        optimizer='adam',
+        metrics=['accuracy']
     )
 
     print(f'Model information: {model.summary()}')
@@ -57,29 +62,12 @@ def train_model(path):
         callbacks=cbs
     )
 
-    for i in range(20):
-        id = randint(len(X_val))
-        image = X_val[id]
-        mask = y_val[id]
-        pred_mask = model.predict(tf.expand_dims(image, axis=0))[0]
-        post_process = (pred_mask[:, :, 0] > 0.5).astype('int')
-
-        plt.figure(figsize=(10, 8))
-        plt.subplot(1, 4, 1)
-        show_image(image, title="Original Image")
-
-        plt.subplot(1, 4, 2)
-        show_image(mask, title="Original Mask")
-
-        plt.subplot(1, 4, 3)
-        show_image(pred_mask, title="Predicted Mask")
-
-        plt.subplot(1, 4, 4)
-        show_image(post_process, title="Post=Processed Mask")
-
-        plt.tight_layout()
-        plt.show()
-
 
 if __name__ == "__main__":
-    train_model("./input/water_segmentation_dataset/water_v1/JPEGImages/ADE20K")
+    print(tf.config.list_physical_devices('GPU'))
+    physical_devices = tf.config.experimental.list_physical_devices('GPU')
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
+    with tf.device('/CPU:0'):
+        train_model("./input/water_segmentation_dataset/water_v1/JPEGImages/ADE20K")
+
+

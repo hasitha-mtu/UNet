@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from tensorflow.python.ops.numpy_ops.np_random import random
 
 from data import load_data
 from numpy.random import randint

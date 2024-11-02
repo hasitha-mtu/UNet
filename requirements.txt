@@ -1,5 +1,5 @@
 tqdm
 tensorflow
 keras
-pillow
 matplotlib
+numpy
