@@ -1,5 +1,3 @@
-from math import floor
-
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from keras.callbacks import (Callback,

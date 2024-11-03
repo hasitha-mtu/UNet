@@ -1,4 +1,3 @@
-import tensorflow as tf
 from keras.layers import (Input,
                           Conv2D)
 from keras.models import Model
