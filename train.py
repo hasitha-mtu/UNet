@@ -8,6 +8,7 @@ from numpy.random import randint
 from data import load_data
 from data_viz import show_image
 from model import get_model
+from multi_model import multi_unet_model
 
 
 def train_model(path):
@@ -41,7 +42,7 @@ def train_model(path):
         ShowProgress()
     ]
 
-    model = get_model()
+    model = multi_unet_model()
     print('model :', model)
 
     print(f'Model information: {model.summary()}')
@@ -49,7 +50,7 @@ def train_model(path):
     model.fit(
         X_train,
         y_train,
-        epochs=20,
+        epochs=50,
         batch_size=16,
         validation_data=(X_val, y_val),
         callbacks=cbs
@@ -60,7 +61,8 @@ if __name__ == "__main__":
     print(tf.config.list_physical_devices('GPU'))
     physical_devices = tf.config.experimental.list_physical_devices('GPU')
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
-    with tf.device('/CPU:0'):
-        train_model("./input/water_segmentation_dataset/water_v1/JPEGImages/ADE20K")
+    train_model("./input/water_segmentation_dataset/water_v1/JPEGImages/ADE20K")
+    # with tf.device('/CPU:0'):
+    #     train_model("./input/water_segmentation_dataset/water_v1/JPEGImages/ADE20K")
 
 
