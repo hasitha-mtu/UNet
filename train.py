@@ -12,6 +12,19 @@ from model import get_model1 as model12
 from model2 import get_model as model2
 from unet_model import get_model as unet
 
+class LossHistory(Callback):
+    def on_train_begin(self, logs):
+        self.per_batch_losses = []
+    def on_batch_end(self, batch, logs):
+        self.per_batch_losses.append(logs.get("loss"))
+    def on_epoch_end(self, epoch, logs):
+        plt.clf()
+        plt.plot(range(len(self.per_batch_losses)), self.per_batch_losses, label="Training loss for each batch")
+        plt.xlabel(f"Batch (epoch {epoch})")
+        plt.ylabel("Loss")
+        plt.legend()
+        plt.savefig(f"plot_at_epoch_{epoch}")
+        self.per_batch_losses = []
 
 def train_model(path):
     (X_train, y_train), (X_val, y_val) = load_data(path)
@@ -41,7 +54,8 @@ def train_model(path):
     cbs = [
         CSVLogger('unet_logs.csv', separator=',', append=False),
         ModelCheckpoint("UNet-WaterBodySegmentation.keras", save_best_only=True),
-        ShowProgress()
+        ShowProgress(),
+        LossHistory()
     ]
 
     model = unet()
