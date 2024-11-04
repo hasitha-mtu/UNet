@@ -8,7 +8,7 @@ from decoder import Decoder
 from encoder import Encoder
 
 
-def get_model():
+def get_model1():
     unet_inputs = Input(shape=(256, 256, 3), name="UNetInput")
     # Encoder Network : Down sampling phase
     p1, c1 = Encoder(64, 0.1, name="Encoder1")(unet_inputs)
@@ -53,7 +53,7 @@ def get_model():
     keras.utils.plot_model(UNet, "unet_model1.png", show_shapes=True)
     return UNet
 
-def get_model1():
+def get_model2():
     unet_inputs = Input(shape=(256, 256, 3), name="UNetInput")
     # Encoder Network : Down sampling phase
     p1, c1 = Encoder(16, 0.1, name="Encoder1")(unet_inputs)
