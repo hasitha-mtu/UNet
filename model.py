@@ -1,3 +1,4 @@
+import keras.utils
 from keras.layers import (Input,
                           Conv2D)
 from keras.models import Model
@@ -48,11 +49,12 @@ def get_model():
         metrics=['accuracy']
     )
 
+    print("model : ", UNet.summary())
+    keras.utils.plot_model(UNet, "unet_model1.png", show_shapes=True)
     return UNet
 
 def visualize_model(model):
     plot_model(model, "UNet-WaterBody.png", show_shapes=True)
 
 if __name__ == "__main__":
-    model = get_model(),
-    print("model : ",model.summary())
+    get_model()

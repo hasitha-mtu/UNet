@@ -7,8 +7,8 @@ from numpy.random import randint
 
 from data import load_data
 from data_viz import show_image
-from model import get_model
-from multi_model import multi_unet_model
+from model import get_model as model1
+from model2 import get_model as model2
 
 
 def train_model(path):
@@ -42,7 +42,7 @@ def train_model(path):
         ShowProgress()
     ]
 
-    model = multi_unet_model()
+    model = model2()
     print('model :', model)
 
     print(f'Model information: {model.summary()}')

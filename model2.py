@@ -1,4 +1,5 @@
 from keras import Model
+import keras.utils
 from keras.layers import (Input,
                           Conv2D,
                           Dropout,
@@ -6,8 +7,11 @@ from keras.layers import (Input,
                           Conv2DTranspose,
                           concatenate)
 
+from decoder import Decoder
+from encoder import Encoder
 
-def multi_unet_model():
+
+def get_model():
     # Build the model
     inputs = Input(shape=(256, 256, 3), name="UNetInput")
     # s = Lambda(lambda x: x / 255)(inputs)   #No need for this if we normalize our inputs beforehand
@@ -75,8 +79,9 @@ def multi_unet_model():
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
     print(f"Model information : {model.summary()}")
+    keras.utils.plot_model(model, "unet_model2.png", show_shapes=True)
 
     return model
 
 if __name__ == "__main__":
-    multi_unet_model()
+    get_model()
