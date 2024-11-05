@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import keras.callbacks_v1
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -11,7 +13,8 @@ from data_viz import show_image
 from model import get_model1 as model11
 from model import get_model2 as model12
 from model import get_model3 as model13
-from model2 import get_model as model2
+from model2 import get_model1 as model21
+from model2 import get_model2 as model22
 from unet_model import get_model as unet
 
 class LossHistory(Callback):
@@ -53,8 +56,9 @@ def train_model(path):
             plt.tight_layout()
             plt.show()
 
-    tensorboard = keras.callbacks_v1.TensorBoard(
-        log_dir="logs/"
+    tensorboard = keras.callbacks.TensorBoard(
+        log_dir = "logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S"),
+        histogram_freq=1
     )
     cbs = [
         CSVLogger('logs/unet_logs.csv', separator=',', append=False),
@@ -64,7 +68,7 @@ def train_model(path):
         tensorboard
     ]
 
-    model = model12()
+    model = model22()
     print('model :', model)
 
     print(f'Model information: {model.summary()}')
@@ -72,34 +76,34 @@ def train_model(path):
     model.fit(
         X_train,
         y_train,
-        epochs=20,
+        epochs=10,
         batch_size=16,
         validation_data=(X_val, y_val),
         callbacks=cbs
     )
 
-    for i in range(20):
-        id = randint(len(X_val))
-        image = X_val[id]
-        mask = y_val[id]
-        pred_mask = model.predict(tf.expand_dims(image, axis=0))[0]
-        post_process = (pred_mask[:, :, 0] > 0.5).astype('int')
-
-        plt.figure(figsize=(10, 8))
-        plt.subplot(1, 4, 1)
-        show_image(image, title="Original Image")
-
-        plt.subplot(1, 4, 2)
-        show_image(mask, title="Original Mask")
-
-        plt.subplot(1, 4, 3)
-        show_image(pred_mask, title="Predicted Mask")
-
-        plt.subplot(1, 4, 4)
-        show_image(post_process, title="Post=Processed Mask")
-
-        plt.tight_layout()
-        plt.show()
+    # for i in range(20):
+    #     id = randint(len(X_val))
+    #     image = X_val[id]
+    #     mask = y_val[id]
+    #     pred_mask = model.predict(tf.expand_dims(image, axis=0))[0]
+    #     post_process = (pred_mask[:, :, 0] > 0.5).astype('int')
+    #
+    #     plt.figure(figsize=(10, 8))
+    #     plt.subplot(1, 4, 1)
+    #     show_image(image, title="Original Image")
+    #
+    #     plt.subplot(1, 4, 2)
+    #     show_image(mask, title="Original Mask")
+    #
+    #     plt.subplot(1, 4, 3)
+    #     show_image(pred_mask, title="Predicted Mask")
+    #
+    #     plt.subplot(1, 4, 4)
+    #     show_image(post_process, title="Post=Processed Mask")
+    #
+    #     plt.tight_layout()
+    #     plt.show()
 
 
 if __name__ == "__main__":
