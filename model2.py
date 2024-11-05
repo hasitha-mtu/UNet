@@ -79,7 +79,7 @@ def get_model():
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
     print(f"Model information : {model.summary()}")
-    keras.utils.plot_model(model, "unet_model2.png", show_shapes=True)
+    # keras.utils.plot_model(model, "unet_model2.png", show_shapes=True)
 
     return model
 
