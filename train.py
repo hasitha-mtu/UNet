@@ -1,3 +1,4 @@
+import keras.callbacks_v1
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from keras.callbacks import (Callback,
@@ -7,8 +8,8 @@ from numpy.random import randint
 
 from data import load_data
 from data_viz import show_image
-from model import get_model as model11
-from model import get_model1 as model12
+from model import get_model1 as model11
+from model import get_model2 as model12
 from model2 import get_model as model2
 from unet_model import get_model as unet
 
@@ -51,14 +52,18 @@ def train_model(path):
             plt.tight_layout()
             plt.show()
 
+    tensorboard = keras.callbacks_v1.TensorBoard(
+        log_dir="logs/"
+    )
     cbs = [
         CSVLogger('unet_logs.csv', separator=',', append=False),
         ModelCheckpoint("UNet-WaterBodySegmentation.keras", save_best_only=True),
-        ShowProgress(),
-        LossHistory()
+        # ShowProgress(),
+        LossHistory(),
+        tensorboard
     ]
 
-    model = unet()
+    model = model12()
     print('model :', model)
 
     print(f'Model information: {model.summary()}')
