@@ -67,20 +67,24 @@ def train_model(path):
         LossHistory(),
         tensorboard
     ]
+    # Create a MirroredStrategy.
+    strategy = tf.distribute.MirroredStrategy()
+    print("Number of devices: {}".format(strategy.num_replicas_in_sync))
 
-    model = model22()
+    with strategy.scope():
+        model = unet()
     print('model :', model)
 
     print(f'Model information: {model.summary()}')
 
-    model.fit(
-        X_train,
-        y_train,
-        epochs=10,
-        batch_size=16,
-        validation_data=(X_val, y_val),
-        callbacks=cbs
-    )
+    history = model.fit(
+                    X_train,
+                    y_train,
+                    epochs=10,
+                    batch_size=16,
+                    validation_data=(X_val, y_val),
+                    callbacks=cbs
+                )
 
     # for i in range(20):
     #     id = randint(len(X_val))
@@ -104,6 +108,22 @@ def train_model(path):
     #
     #     plt.tight_layout()
     #     plt.show()
+    accuracy = history.history["accuracy"]
+    val_accuracy = history.history["val_accuracy"]
+    loss = history.history["loss"]
+    val_loss = history.history["val_loss"]
+    epochs = range(1, len(accuracy) + 1)
+    plt.plot(epochs, accuracy, "bo", label="Training accuracy")
+    plt.plot(epochs, val_accuracy, "b", label="Validation accuracy")
+    plt.title("Training and validation accuracy")
+    plt.legend()
+    plt.figure()
+    plt.plot(epochs, loss, "bo", label="Training loss")
+    plt.plot(epochs, val_loss, "b", label="Validation loss")
+    plt.title("Training and validation loss")
+    plt.legend()
+    plt.show()
+    return None
 
 
 if __name__ == "__main__":
