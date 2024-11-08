@@ -1,4 +1,3 @@
-import keras.utils
 from keras.layers import (Input,
                           Conv2D)
 from keras.models import Model

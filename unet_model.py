@@ -1,5 +1,4 @@
 from keras import Model
-import keras.utils
 from keras.layers import (Input,
                           Conv2D,
                           MaxPooling2D,

@@ -1,14 +1,10 @@
 from keras import Model
-import keras.utils
 from keras.layers import (Input,
                           Conv2D,
                           Dropout,
                           MaxPooling2D,
                           Conv2DTranspose,
                           concatenate)
-
-from decoder import Decoder
-from encoder import Encoder
 
 
 def get_model1():
