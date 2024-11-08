@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 import keras.callbacks_v1
@@ -62,20 +63,17 @@ def train_model(path):
     )
     cbs = [
         CSVLogger('logs/unet_logs.csv', separator=',', append=False),
-        ModelCheckpoint("UNet-WaterBodySegmentation.keras", save_best_only=True),
+        ModelCheckpoint("ckpt/ckpt-{epoch}", save_freq="epoch"),
         # ShowProgress(),
         LossHistory(),
         tensorboard
     ]
     # Create a MirroredStrategy.
-    strategy = tf.distribute.MirroredStrategy()
+    strategy = tf.distribute.MirroredStrategy(cross_device_ops = tf.distribute.HierarchicalCopyAllReduce())
     print("Number of devices: {}".format(strategy.num_replicas_in_sync))
 
     with strategy.scope():
-        model = unet()
-    print('model :', model)
-
-    print(f'Model information: {model.summary()}')
+        model = make_or_restore_model()
 
     history = model.fit(
                     X_train,
@@ -125,15 +123,30 @@ def train_model(path):
     plt.show()
     return None
 
+def make_or_restore_model():
+    checkpoints = ["ckpt/" + name for name in os.listdir("ckpt")]
+    if checkpoints:
+        latest_checkpoint = max(checkpoints, key=os.path.getctime())
+        print(f"Restoring from {latest_checkpoint}")
+        return keras.models.load_model(latest_checkpoint)
+    else:
+        print("Creating fresh model")
+        return unet()
+
+# if __name__ == "__main__":
+#     print(tf.config.list_physical_devices('GPU'))
+#     physical_devices = tf.config.experimental.list_physical_devices('GPU')
+#     if len(physical_devices) > 0:
+#         tf.config.experimental.set_visible_devices(physical_devices[0], 'GPU')
+#         tf.config.experimental.set_memory_growth(physical_devices[0], True)
+#         train_model("./input/water_segmentation_dataset/water_v1/JPEGImages/ADE20K")
+
+# if __name__ == "__main__":
+#     with tf.device('/CPU:0'):
+#         train_model("./input/water_segmentation_dataset/water_v1/JPEGImages/ADE20K")
 
 if __name__ == "__main__":
     print(tf.config.list_physical_devices('GPU'))
     physical_devices = tf.config.experimental.list_physical_devices('GPU')
     if len(physical_devices) > 0:
-        tf.config.experimental.set_visible_devices(physical_devices[0], 'GPU')
-        tf.config.experimental.set_memory_growth(physical_devices[0], True)
         train_model("./input/water_segmentation_dataset/water_v1/JPEGImages/ADE20K")
-
-# if __name__ == "__main__":
-#     with tf.device('/CPU:0'):
-#         train_model("./input/water_segmentation_dataset/water_v1/JPEGImages/ADE20K")
