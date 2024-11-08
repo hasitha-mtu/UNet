@@ -57,7 +57,7 @@ def train_model(path):
     history = model.fit(
                     X_train,
                     y_train,
-                    epochs=20,
+                    epochs=50,
                     batch_size=16,
                     validation_data=(X_val, y_val),
                     callbacks=cbs
