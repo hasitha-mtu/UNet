@@ -37,26 +37,6 @@ def train_model(path):
     print(f'X_train shape : {X_train.shape}')
     print(f'y_train shape : {y_train.shape}')
 
-    class ShowProgress(Callback):
-        def on_epoch_end(self, epoch, logs=None):
-            id = randint(len(X_val))
-            image = X_val[id]
-            mask = y_val[id]
-            pred_mask = self.model(tf.expand_dims(image, axis=0))[0]
-
-            plt.figure(figsize=(10, 8))
-            plt.subplot(1, 3, 1)
-            show_image(image, title="Original Image")
-
-            plt.subplot(1, 3, 2)
-            show_image(mask, title="Original Mask")
-
-            plt.subplot(1, 3, 3)
-            show_image(pred_mask, title="Predicted Mask")
-
-            plt.tight_layout()
-            plt.show()
-
     tensorboard = keras.callbacks.TensorBoard(
         log_dir = "logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S"),
         histogram_freq=1
@@ -64,7 +44,6 @@ def train_model(path):
     cbs = [
         CSVLogger('logs/unet_logs.csv', separator=',', append=False),
         ModelCheckpoint("ckpt/ckpt-{epoch}", save_freq="epoch"),
-        # ShowProgress(),
         LossHistory(),
         tensorboard
     ]
@@ -78,34 +57,12 @@ def train_model(path):
     history = model.fit(
                     X_train,
                     y_train,
-                    epochs=10,
+                    epochs=20,
                     batch_size=16,
                     validation_data=(X_val, y_val),
                     callbacks=cbs
                 )
 
-    # for i in range(20):
-    #     id = randint(len(X_val))
-    #     image = X_val[id]
-    #     mask = y_val[id]
-    #     pred_mask = model.predict(tf.expand_dims(image, axis=0))[0]
-    #     post_process = (pred_mask[:, :, 0] > 0.5).astype('int')
-    #
-    #     plt.figure(figsize=(10, 8))
-    #     plt.subplot(1, 4, 1)
-    #     show_image(image, title="Original Image")
-    #
-    #     plt.subplot(1, 4, 2)
-    #     show_image(mask, title="Original Mask")
-    #
-    #     plt.subplot(1, 4, 3)
-    #     show_image(pred_mask, title="Predicted Mask")
-    #
-    #     plt.subplot(1, 4, 4)
-    #     show_image(post_process, title="Post=Processed Mask")
-    #
-    #     plt.tight_layout()
-    #     plt.show()
     accuracy = history.history["accuracy"]
     val_accuracy = history.history["val_accuracy"]
     loss = history.history["loss"]
@@ -125,8 +82,9 @@ def train_model(path):
 
 def make_or_restore_model():
     checkpoints = ["ckpt/" + name for name in os.listdir("ckpt")]
+    print(f"Checkpoints: {checkpoints}")
     if checkpoints:
-        latest_checkpoint = max(checkpoints, key=os.path.getctime())
+        latest_checkpoint = max(checkpoints, key=os.path.getctime)
         print(f"Restoring from {latest_checkpoint}")
         return keras.models.load_model(latest_checkpoint)
     else:

@@ -3,3 +3,5 @@
 logs/
 input/
 __pycache__/
+ckpt/
+plots/

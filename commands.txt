@@ -1,1 +1,3 @@
  tensorboard.exe --logdir C:\Users\AdikariAdikari\PycharmProjects\UNet\logs
+
+  tensorboard --logdir logs/

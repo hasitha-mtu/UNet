@@ -1,3 +1,4 @@
+from tensorflow import keras
 from keras import Model
 from keras.layers import (Input,
                           Conv2D,
@@ -55,7 +56,7 @@ def get_model():
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
     print(f"Model information : {model.summary()}")
-    # keras.utils.plot_model(model, "unet_model3.png", show_shapes=True)
+    keras.utils.plot_model(model, "unet_model3.png", show_shapes=True)
 
     return model
 
