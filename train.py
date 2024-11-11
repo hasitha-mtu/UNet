@@ -57,7 +57,7 @@ def train_model(path):
     history = model.fit(
                     X_train,
                     y_train,
-                    epochs=50,
+                    epochs=20,
                     batch_size=16,
                     validation_data=(X_val, y_val),
                     callbacks=cbs
@@ -89,7 +89,7 @@ def make_or_restore_model():
         return keras.models.load_model(latest_checkpoint)
     else:
         print("Creating fresh model")
-        return unet()
+        return model11()
 
 # if __name__ == "__main__":
 #     print(tf.config.list_physical_devices('GPU'))
