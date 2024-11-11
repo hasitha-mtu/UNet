@@ -7,9 +7,11 @@ import tensorflow as tf
 from keras.callbacks import (Callback,
                              ModelCheckpoint,
                              CSVLogger)
+import numpy as np
+from tensorflow.keras.utils import array_to_img
 from numpy.random import randint
 
-from data import load_data
+from data import load_data, load_drone_dataset
 from data_viz import show_image
 from model import get_model1 as model11
 from model import get_model2 as model12
@@ -32,8 +34,8 @@ class LossHistory(Callback):
         plt.savefig(f"plots/plot_at_epoch_{epoch}")
         self.per_batch_losses = []
 
-def train_model(path):
-    (X_train, y_train), (X_val, y_val) = load_data(path)
+def train_model(path, restore=True):
+    (X_train, y_train), (X_val, y_val) = load_drone_dataset(path)
     print(f'X_train shape : {X_train.shape}')
     print(f'y_train shape : {y_train.shape}')
 
@@ -41,10 +43,32 @@ def train_model(path):
         log_dir = "logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S"),
         histogram_freq=1
     )
+
+    # class ShowProgress(Callback):
+    #     def on_epoch_end(self, epoch, logs=None):
+    #         id = randint(len(X_val))
+    #         image = X_val[id]
+    #         mask = y_val[id]
+    #         pred_mask = self.model(tf.expand_dims(image, axis=0))[0]
+    #
+    #         plt.figure(figsize=(10, 8))
+    #         plt.subplot(1, 3, 1)
+    #         show_image(image, title="Original Image")
+    #
+    #         plt.subplot(1, 3, 2)
+    #         show_image(mask, title="Original Mask")
+    #
+    #         plt.subplot(1, 3, 3)
+    #         show_image(pred_mask, title="Predicted Mask")
+    #
+    #         plt.tight_layout()
+    #         plt.show()
+
     cbs = [
         CSVLogger('logs/unet_logs.csv', separator=',', append=False),
         ModelCheckpoint("ckpt/ckpt-{epoch}", save_freq="epoch"),
         LossHistory(),
+        # ShowProgress(),
         tensorboard
     ]
     # Create a MirroredStrategy.
@@ -52,7 +76,7 @@ def train_model(path):
     print("Number of devices: {}".format(strategy.num_replicas_in_sync))
 
     with strategy.scope():
-        model = make_or_restore_model()
+        model = make_or_restore_model(restore)
 
     history = model.fit(
                     X_train,
@@ -80,16 +104,45 @@ def train_model(path):
     plt.show()
     return None
 
-def make_or_restore_model():
+def make_or_restore_model(restore):
+    if restore:
+        checkpoints = ["ckpt/" + name for name in os.listdir("ckpt")]
+        print(f"Checkpoints: {checkpoints}")
+        if checkpoints:
+            latest_checkpoint = max(checkpoints, key=os.path.getctime)
+            print(f"Restoring from {latest_checkpoint}")
+            return keras.models.load_model(latest_checkpoint)
+        else:
+            print("Creating fresh model")
+            return unet()
+    else:
+        print("Creating fresh model")
+        return unet()
+
+def load_with_trained_model(path):
+    _, (X_val, _) = load_drone_dataset(path)
     checkpoints = ["ckpt/" + name for name in os.listdir("ckpt")]
     print(f"Checkpoints: {checkpoints}")
     if checkpoints:
         latest_checkpoint = max(checkpoints, key=os.path.getctime)
         print(f"Restoring from {latest_checkpoint}")
-        return keras.models.load_model(latest_checkpoint)
+        model = keras.models.load_model(latest_checkpoint)
+        i = 4
+        test_image = X_val[i]
+        plt.axis("off")
+        plt.imshow(array_to_img(test_image))
+        mask = model.predict(np.expand_dims(test_image, 0))[0]
+        display_mask(mask)
     else:
-        print("Creating fresh model")
-        return model11()
+        print("No preloaded model")
+    return None
+
+def display_mask(pred):
+    mask = np.argmax(pred, axis=-1)
+    mask *= 127
+    plt.axis("off")
+    plt.imshow(mask)
+    plt.show()
 
 # if __name__ == "__main__":
 #     print(tf.config.list_physical_devices('GPU'))
@@ -107,4 +160,6 @@ if __name__ == "__main__":
     print(tf.config.list_physical_devices('GPU'))
     physical_devices = tf.config.experimental.list_physical_devices('GPU')
     if len(physical_devices) > 0:
-        train_model("./input/water_segmentation_dataset/water_v1/JPEGImages/ADE20K")
+        # train_model("./input/water_segmentation_dataset/water_v1/JPEGImages/ADE20K")
+        # load_with_trained_model("input/drone_dataset/images")
+        train_model("input/drone_dataset/images", restore=False)

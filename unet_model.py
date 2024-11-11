@@ -4,12 +4,19 @@ from keras.layers import (Input,
                           Conv2D,
                           MaxPooling2D,
                           Conv2DTranspose,
-                          concatenate, BatchNormalization, Dropout)
+                          concatenate, BatchNormalization, Dropout,
+                          RandomFlip, RandomRotation, RandomZoom, Rescaling)
 
 
 def get_model():
+    data_augmentation = keras.Sequential([
+        RandomFlip("horizontal"),
+        RandomRotation(0.1),
+        RandomZoom(0.2)
+    ])
     inputs = Input(shape=(256, 256, 3), name="UnetModelInput")
-    b1 = BatchNormalization()(inputs)
+    a = data_augmentation(inputs)
+    b1 = BatchNormalization()(a)
     c1 = Conv2D(64, kernel_size=(3, 3), activation="relu", kernel_initializer='he_normal', padding='same')(b1)
     d1 = Dropout(0.2)(c1)
     c2 = Conv2D(64, kernel_size=(3, 3), activation="relu", kernel_initializer='he_normal', padding='same')(d1)
