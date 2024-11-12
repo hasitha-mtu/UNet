@@ -19,6 +19,7 @@ from model import get_model3 as model13
 from model2 import get_model1 as model21
 from model2 import get_model2 as model22
 from unet_model import get_model as unet
+from unet_model import get_model2 as unet2
 
 class LossHistory(Callback):
     def on_train_begin(self, logs):
@@ -114,10 +115,10 @@ def make_or_restore_model(restore):
             return keras.models.load_model(latest_checkpoint)
         else:
             print("Creating fresh model")
-            return unet()
+            return unet2()
     else:
         print("Creating fresh model")
-        return unet()
+        return unet2()
 
 def load_with_trained_model(path):
     _, (X_val, _) = load_drone_dataset(path)
@@ -159,7 +160,8 @@ def display_mask(pred):
 if __name__ == "__main__":
     print(tf.config.list_physical_devices('GPU'))
     physical_devices = tf.config.experimental.list_physical_devices('GPU')
+    print(f"physical_devices : {physical_devices}")
     if len(physical_devices) > 0:
         # train_model("./input/water_segmentation_dataset/water_v1/JPEGImages/ADE20K")
         # load_with_trained_model("input/drone_dataset/images")
-        train_model("input/drone_dataset/images", restore=False)
+        train_model("input/12_11_2024/semantic_drone_dataset/data/images", restore=False)
