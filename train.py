@@ -120,20 +120,28 @@ def make_or_restore_model(restore):
         print("Creating fresh model")
         return unet2()
 
-def load_with_trained_model(path):
-    _, (X_val, _) = load_drone_dataset(path)
+def load_with_trained_model(path, count=5):
+    _, (X_val, y_val) = load_drone_dataset(path)
     checkpoints = ["ckpt/" + name for name in os.listdir("ckpt")]
     print(f"Checkpoints: {checkpoints}")
     if checkpoints:
         latest_checkpoint = max(checkpoints, key=os.path.getctime)
         print(f"Restoring from {latest_checkpoint}")
         model = keras.models.load_model(latest_checkpoint)
-        i = 4
-        test_image = X_val[i]
-        plt.axis("off")
-        plt.imshow(array_to_img(test_image))
-        mask = model.predict(np.expand_dims(test_image, 0))[0]
-        display_mask(mask)
+        for i in range(count):
+            id = randint(len(X_val))
+            image = X_val[id]
+            mask = y_val[id]
+            pred_mask = model.predict(np.expand_dims(image, 0))[0]
+            plt.figure(figsize=(10, 8))
+            plt.subplot(1, 3, 1)
+            show_image(image, title="Original Image")
+            plt.subplot(1, 3, 2)
+            show_image(mask, title="Original Mask")
+            plt.subplot(1, 3, 3)
+            show_image(pred_mask, title="Predicted Mask")
+            plt.tight_layout()
+            plt.show()
     else:
         print("No preloaded model")
     return None
@@ -164,4 +172,5 @@ if __name__ == "__main__":
     if len(physical_devices) > 0:
         # train_model("./input/water_segmentation_dataset/water_v1/JPEGImages/ADE20K")
         # load_with_trained_model("input/drone_dataset/images")
-        train_model("input/12_11_2024/semantic_drone_dataset/data/images", restore=False)
+        load_with_trained_model("input/12_11_2024/semantic_drone_dataset/data/images")
+        # train_model("input/12_11_2024/semantic_drone_dataset/data/images", restore=True)
