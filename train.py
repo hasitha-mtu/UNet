@@ -172,5 +172,5 @@ if __name__ == "__main__":
     if len(physical_devices) > 0:
         # train_model("./input/water_segmentation_dataset/water_v1/JPEGImages/ADE20K")
         # load_with_trained_model("input/drone_dataset/images")
-        load_with_trained_model("input/12_11_2024/semantic_drone_dataset/data/images")
+        load_with_trained_model("input/drone_dataset/images")
         # train_model("input/12_11_2024/semantic_drone_dataset/data/images", restore=True)

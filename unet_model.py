@@ -153,7 +153,7 @@ def get_model2():
     model = Model(inputs=[inputs], outputs=[outputs], name="AttentionUNet")
 
     # NOTE: Compile the model in the main program to make it easy to test with various loss functions
-    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy', f1_m])
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
     print(f"Model information : {model.summary()}")
     keras.utils.plot_model(model, "unet_model4.png", show_shapes=True)
